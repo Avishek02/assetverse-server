@@ -4,6 +4,8 @@ const cors = require("cors")
 const cookieParser = require("cookie-parser")
 const connectDB = require("./config/db")
 const authRoutes = require("./routes/auth.routes")
+const assetRoutes = require("./routes/asset.routes")
+
 
 const app = express()
 
@@ -19,6 +21,8 @@ app.use(
 
 app.use(express.json())
 app.use(cookieParser())
+app.use("/api/assets", assetRoutes)
+
 
 app.get("/", (req, res) => {
   res.send("AssetVerse server is running")

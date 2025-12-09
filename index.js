@@ -9,10 +9,14 @@ const app = express()
 
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN,
+    origin: [
+      process.env.CLIENT_ORIGIN_LOCAL,
+      process.env.CLIENT_ORIGIN_PROD
+    ],
     credentials: true,
   })
 )
+
 app.use(express.json())
 app.use(cookieParser())
 

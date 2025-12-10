@@ -11,8 +11,6 @@ const requestRoutes = require("./routes/request.routes")
 
 const app = express()
 
-app.use("/api/requests", requestRoutes)
-
 
 app.use(
   cors({
@@ -26,14 +24,17 @@ app.use(
 
 app.use(express.json())
 app.use(cookieParser())
+
+app.use("/api/requests", requestRoutes)
 app.use("/api/assets", assetRoutes)
+app.use("/api/auth", authRoutes)
+
 
 
 app.get("/", (req, res) => {
   res.send("AssetVerse server is running")
 })
 
-app.use("/api/auth", authRoutes)
 
 const port = process.env.PORT || 5000
 

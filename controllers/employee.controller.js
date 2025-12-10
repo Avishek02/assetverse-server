@@ -1,5 +1,7 @@
 const EmployeeAffiliation = require("../models/EmployeeAffiliation")
 const AssignedAsset = require("../models/AssignedAsset")
+const Asset = require("../models/Asset")
+const User = require("../models/User")
 
 const getHrEmployees = async (req, res) => {
   try {
@@ -38,4 +40,56 @@ const getHrEmployees = async (req, res) => {
   }
 }
 
-module.exports = { getHrEmployees }
+
+
+const removeEmployee = async (req, res) => {
+  try {
+    const hrEmail = req.user.email
+    const { employeeEmail } = req.params
+
+    const affiliation = await EmployeeAffiliation.findOne({
+      hrEmail,
+      employeeEmail,
+      status: "active",
+    })
+
+    if (!affiliation) {
+      return res.status(404).json({ message: "Employee not affiliated" })
+    }
+
+    // return all assigned assets
+    const assigned = await AssignedAsset.find({
+      hrEmail,
+      employeeEmail,
+      status: "assigned",
+    })
+
+    for (const item of assigned) {
+      const asset = await Asset.findById(item.assetId)
+      if (asset) {
+        asset.availableQuantity += 1
+        await asset.save()
+      }
+      item.status = "returned"
+      item.returnDate = new Date()
+      await item.save()
+    }
+
+    affiliation.status = "inactive"
+    await affiliation.save()
+
+    const hrUser = await User.findOne({ email: hrEmail })
+    if (hrUser.currentEmployees > 0) {
+      hrUser.currentEmployees -= 1
+      await hrUser.save()
+    }
+
+    res.json({ message: "Employee removed and assets returned" })
+  } catch (error) {
+    res.status(500).json({ message: "Server error" })
+  }
+}
+
+
+
+module.exports = { getHrEmployees, removeEmployee }

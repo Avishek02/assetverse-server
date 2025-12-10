@@ -6,4 +6,7 @@ const router = express.Router()
 
 router.get("/hr", verifyToken, verifyHR, getHrEmployees)
 
+router.delete("/hr/:employeeEmail", verifyToken, verifyHR, removeEmployee)
+
+
 module.exports = router

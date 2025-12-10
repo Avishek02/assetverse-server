@@ -57,7 +57,6 @@ const removeEmployee = async (req, res) => {
       return res.status(404).json({ message: "Employee not affiliated" })
     }
 
-    // return all assigned assets
     const assigned = await AssignedAsset.find({
       hrEmail,
       employeeEmail,
@@ -75,6 +74,20 @@ const removeEmployee = async (req, res) => {
       await item.save()
     }
 
+    await Request.updateMany(
+      {
+        hrEmail,
+        requesterEmail: employeeEmail,
+        requestStatus: "approved",
+      },
+      {
+        $set: {
+          requestStatus: "returned",
+          approvalDate: new Date(),
+        },
+      }
+    )
+
     affiliation.status = "inactive"
     await affiliation.save()
 
@@ -89,6 +102,7 @@ const removeEmployee = async (req, res) => {
     res.status(500).json({ message: "Server error" })
   }
 }
+
 
 
 

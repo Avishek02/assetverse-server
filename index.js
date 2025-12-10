@@ -14,6 +14,9 @@ const userRoutes = require("./routes/user.routes")
 
 const analyticsRoutes = require("./routes/analytics.routes")
 const paymentRoutes = require("./routes/payment.routes")
+const packageRoutes = require("./routes/package.routes")
+
+
 
 
 
@@ -46,13 +49,7 @@ app.use("/api/teams", teamRoutes)
 app.use("/api/users", userRoutes)
 app.use("/api/analytics", analyticsRoutes)
 app.use("/api/payments", paymentRoutes)
-
-
-
-
-
-
-
+app.use("/api/packages", packageRoutes)
 
 
 

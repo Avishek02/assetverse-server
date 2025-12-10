@@ -9,6 +9,8 @@ const assetRoutes = require("./routes/asset.routes")
 const requestRoutes = require("./routes/request.routes")
 const assignedRoutes = require("./routes/assigned.routes")
 
+const employeeRoutes = require("./routes/employee.routes")
+
 
 const app = express()
 app.use(
@@ -32,6 +34,8 @@ app.use("/api/assets", assetRoutes)
 app.use("/api/auth", authRoutes)
 
 app.use("/api/assigned-assets", assignedRoutes)
+app.use("/api/employees", employeeRoutes)
+
 
 
 

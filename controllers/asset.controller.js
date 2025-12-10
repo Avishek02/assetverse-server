@@ -78,4 +78,22 @@ const deleteAsset = async (req, res) => {
 module.exports = { createAsset, getHrAssets, deleteAsset }
 
 
+const getAvailableAssetsForEmployees = async (req, res) => {
+  try {
+    const search = req.query.search || ""
+
+    const query = {
+      availableQuantity: { $gt: 0 },
+      productName: { $regex: search, $options: "i" },
+    }
+
+    const assets = await Asset.find(query).sort({ createdAt: -1 })
+
+    res.json(assets)
+  } catch (error) {
+    res.status(500).json({ message: "Server error" })
+  }
+}
+
+module.exports = { createAsset, getHrAssets, deleteAsset, getAvailableAssetsForEmployees }
 

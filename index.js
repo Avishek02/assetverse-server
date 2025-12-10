@@ -12,6 +12,10 @@ const employeeRoutes = require("./routes/employee.routes")
 const teamRoutes = require("./routes/team.routes")
 const userRoutes = require("./routes/user.routes")
 
+const analyticsRoutes = require("./routes/analytics.routes")
+
+
+
 
 const app = express()
 app.use(
@@ -38,6 +42,8 @@ app.use("/api/assigned-assets", assignedRoutes)
 app.use("/api/employees", employeeRoutes)
 app.use("/api/teams", teamRoutes)
 app.use("/api/users", userRoutes)
+app.use("/api/analytics", analyticsRoutes)
+
 
 
 

@@ -7,11 +7,10 @@ const authRoutes = require("./routes/auth.routes")
 const assetRoutes = require("./routes/asset.routes")
 
 const requestRoutes = require("./routes/request.routes")
+const assignedRoutes = require("./routes/assigned.routes")
 
 
 const app = express()
-
-
 app.use(
   cors({
     origin: [
@@ -22,6 +21,9 @@ app.use(
   })
 )
 
+
+
+
 app.use(express.json())
 app.use(cookieParser())
 
@@ -29,11 +31,16 @@ app.use("/api/requests", requestRoutes)
 app.use("/api/assets", assetRoutes)
 app.use("/api/auth", authRoutes)
 
+app.use("/api/assigned-assets", assignedRoutes)
+
+
 
 
 app.get("/", (req, res) => {
   res.send("AssetVerse server is running")
 })
+
+
 
 
 const port = process.env.PORT || 5000

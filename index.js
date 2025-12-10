@@ -6,8 +6,13 @@ const connectDB = require("./config/db")
 const authRoutes = require("./routes/auth.routes")
 const assetRoutes = require("./routes/asset.routes")
 
+const requestRoutes = require("./routes/request.routes")
+
 
 const app = express()
+
+app.use("/api/requests", requestRoutes)
+
 
 app.use(
   cors({

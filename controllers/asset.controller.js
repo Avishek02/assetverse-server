@@ -76,3 +76,6 @@ const deleteAsset = async (req, res) => {
 }
 
 module.exports = { createAsset, getHrAssets, deleteAsset }
+
+
+

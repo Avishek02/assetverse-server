@@ -53,8 +53,10 @@ const createCheckoutSession = async (req, res) => {
 
     res.json({ url: session.url })
   } catch (error) {
+    console.error("Create checkout session error:", error)
     res.status(500).json({ message: "Server error" })
   }
+
 }
 
 const confirmPayment = async (req, res) => {
@@ -87,8 +89,11 @@ const confirmPayment = async (req, res) => {
 
     res.json({ message: "Payment confirmed and package updated" })
   } catch (error) {
+    console.error("Confirm payment error:", error)
     res.status(500).json({ message: "Server error" })
   }
+
+
 }
 
 module.exports = { createCheckoutSession, confirmPayment }

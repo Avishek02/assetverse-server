@@ -1,18 +1,26 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 const Payment = require("../models/Payment")
 const User = require("../models/User")
+const Package = require("../models/Package")
 
 const createCheckoutSession = async (req, res) => {
   try {
     const hrEmail = req.user.email
-    const { packageName, employeeLimit, price } = req.body
+    const { packageName } = req.body
 
     const hrUser = await User.findOne({ email: hrEmail, role: "hr" })
     if (!hrUser) {
       return res.status(404).json({ message: "HR not found" })
     }
 
-    const amountInCents = price * 100
+    const pkg = await Package.findOne({ name: packageName })
+    if (!pkg) {
+      return res.status(400).json({ message: "Invalid package" })
+    }
+
+    const realPrice = pkg.price
+    const realLimit = pkg.employeeLimit
+    const amountInCents = realPrice * 100
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -22,7 +30,7 @@ const createCheckoutSession = async (req, res) => {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `${packageName} package`,
+              name: `${pkg.name} package`,
             },
             unit_amount: amountInCents,
           },
@@ -36,9 +44,9 @@ const createCheckoutSession = async (req, res) => {
 
     await Payment.create({
       hrEmail,
-      packageName,
-      employeeLimit,
-      amount: price,
+      packageName: pkg.name,
+      employeeLimit: realLimit,
+      amount: amountInCents,
       transactionId: session.id,
       status: "pending",
     })
@@ -55,7 +63,6 @@ const confirmPayment = async (req, res) => {
     const hrEmail = req.user.email
 
     const session = await stripe.checkout.sessions.retrieve(sessionId)
-
     if (session.payment_status !== "paid") {
       return res.status(400).json({ message: "Payment not completed" })
     }

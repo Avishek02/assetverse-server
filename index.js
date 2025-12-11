@@ -30,9 +30,12 @@ app.use(
       process.env.CLIENT_ORIGIN_LOCAL,
       process.env.CLIENT_ORIGIN_PROD
     ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
-)
+);
+
 
 
 

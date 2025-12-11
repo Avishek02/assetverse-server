@@ -2,6 +2,8 @@ const EmployeeAffiliation = require("../models/EmployeeAffiliation")
 const AssignedAsset = require("../models/AssignedAsset")
 const Asset = require("../models/Asset")
 const User = require("../models/User")
+const Request = require("../models/Request")
+
 
 const getHrEmployees = async (req, res) => {
   try {

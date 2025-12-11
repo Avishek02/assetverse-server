@@ -50,4 +50,30 @@ const upsertUser = async (req, res) => {
   }
 }
 
-module.exports = { upsertUser }
+const checkUserExists = async (req, res) => {
+  const { email } = req.query
+
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" })
+  }
+
+  try {
+    const user = await User.findOne({ email })
+
+    if (!user) {
+      return res.json({ exists: false })
+    }
+
+    const token = generateToken({ email: user.email, role: user.role })
+
+    return res.json({
+      exists: true,
+      user,
+      token,
+    })
+  } catch (error) {
+    res.status(500).json({ message: "Server error" })
+  }
+}
+
+module.exports = { upsertUser, checkUserExists }

@@ -30,11 +30,13 @@ app.use(
       process.env.CLIENT_ORIGIN_LOCAL,
       process.env.CLIENT_ORIGIN_PROD
     ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
+
+app.options("*", cors());
 
 
 

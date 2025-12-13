@@ -1,5 +1,7 @@
 const Asset = require("../models/Asset")
 const User = require("../models/User")
+const AssignedAsset = require("../models/AssignedAsset")
+const EmployeeAffiliation = require("../models/EmployeeAffiliation")
 
 const createAsset = async (req, res) => {
   try {
@@ -95,5 +97,57 @@ const getAvailableAssetsForEmployees = async (req, res) => {
   }
 }
 
-module.exports = { createAsset, getHrAssets, deleteAsset, getAvailableAssetsForEmployees }
+
+
+
+const directAssignAsset = async (req, res) => {
+  try {
+    const hrEmail = req.user.email
+    const { assetId } = req.params
+    const { employeeEmail } = req.body
+
+    const affiliation = await EmployeeAffiliation.findOne({
+      hrEmail,
+      employeeEmail,
+      status: "active",
+    })
+
+    if (!affiliation) {
+      return res.status(403).json({ message: "Employee not affiliated" })
+    }
+
+    const asset = await Asset.findOne({ _id: assetId, hrEmail })
+    if (!asset) {
+      return res.status(404).json({ message: "Asset not found" })
+    }
+
+    if (asset.availableQuantity <= 0) {
+      return res.status(400).json({ message: "Asset out of stock" })
+    }
+
+    asset.availableQuantity -= 1
+    await asset.save()
+
+    const assigned = await AssignedAsset.create({
+      assetId: asset._id,
+      assetName: asset.productName,
+      assetImage: asset.productImage,
+      assetType: asset.productType,
+      employeeEmail,
+      employeeName: affiliation.employeeName,
+      hrEmail,
+      companyName: asset.companyName,
+      assignmentDate: new Date(),
+      returnDate: null,
+      status: "assigned",
+    })
+
+    res.status(201).json(assigned)
+  } catch (error) {
+    res.status(500).json({ message: "Server error" })
+  }
+}
+
+
+module.exports = { createAsset, getHrAssets, deleteAsset, getAvailableAssetsForEmployees, directAssignAsset }
 

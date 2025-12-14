@@ -1,5 +1,8 @@
 const Asset = require("../models/Asset")
 const Request = require("../models/Request")
+const AssignedAsset = require("../models/AssignedAsset")
+
+
 
 const getAssetTypeDistribution = async (req, res) => {
   try {
@@ -53,4 +56,28 @@ const getTopRequestedAssets = async (req, res) => {
   }
 }
 
-module.exports = { getAssetTypeDistribution, getTopRequestedAssets }
+
+const getHROverview = async (req, res) => {
+  try {
+    const hrEmail = req.user.email
+
+    const activeAssets = await Asset.countDocuments({ hrEmail })
+
+    const assigned = await AssignedAsset.countDocuments({
+      hrEmail,
+      status: "assigned",
+    })
+
+    const returnable = await AssignedAsset.countDocuments({
+      hrEmail,
+      status: "assigned",
+      assetType: "Returnable",
+    })
+
+    res.json({ activeAssets, assigned, returnable })
+  } catch (error) {
+    res.status(500).json({ message: "Server error" })
+  }
+}
+
+module.exports = { getAssetTypeDistribution, getTopRequestedAssets, getHROverview }

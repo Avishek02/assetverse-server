@@ -17,6 +17,8 @@ const paymentRoutes = require("./routes/payment.routes")
 const packageRoutes = require("./routes/package.routes")
 
 const noticeRoutes = require("./routes/notice.routes")
+const affiliationRoutes = require("./routes/affiliation.routes")
+
 
 
 
@@ -54,6 +56,8 @@ app.use("/api/analytics", analyticsRoutes)
 app.use("/api/payments", paymentRoutes)
 app.use("/api/packages", packageRoutes)
 app.use("/api/notices", noticeRoutes)
+app.use("/api/affiliations", affiliationRoutes)
+
 
 
 

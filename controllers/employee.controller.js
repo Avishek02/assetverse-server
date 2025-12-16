@@ -4,7 +4,6 @@ const Asset = require("../models/Asset")
 const User = require("../models/User")
 const Request = require("../models/Request")
 
-
 const getHrEmployees = async (req, res) => {
   try {
     const hrEmail = req.user.email
@@ -12,9 +11,11 @@ const getHrEmployees = async (req, res) => {
     const affiliations = await EmployeeAffiliation.find({
       hrEmail,
       status: "active",
-    }).sort({ createdAt: -1 })
+    })
+      .sort({ createdAt: -1 })
+      .lean()
 
-    const emails = affiliations.map(a => a.employeeEmail)
+    const emails = affiliations.map(a => a.employeeEmail).filter(Boolean)
 
     const assetCounts = await AssignedAsset.aggregate([
       { $match: { hrEmail, employeeEmail: { $in: emails }, status: "assigned" } },
@@ -26,23 +27,31 @@ const getHrEmployees = async (req, res) => {
       countMap[a._id] = a.count
     })
 
-    const result = affiliations.map(a => ({
-      id: a._id,
-      employeeName: a.employeeName,
-      employeeEmail: a.employeeEmail,
-      companyName: a.companyName,
-      companyLogo: a.companyLogo,
-      affiliationDate: a.affiliationDate,
-      assetsCount: countMap[a.employeeEmail] || 0,
-    }))
+    const users = await User.find({ email: { $in: emails } })
+      .select("email name profileImage")
+      .lean()
+
+    const userMap = new Map(users.map(u => [u.email, u]))
+
+    const result = affiliations.map(a => {
+      const u = userMap.get(a.employeeEmail)
+      return {
+        id: a._id,
+        employeeName: a.employeeName || u?.name || "",
+        employeeEmail: a.employeeEmail,
+        companyName: a.companyName,
+        companyLogo: a.companyLogo,
+        affiliationDate: a.affiliationDate,
+        assetsCount: countMap[a.employeeEmail] || 0,
+        profileImage: u?.profileImage || null,
+      }
+    })
 
     res.json(result)
   } catch (error) {
     res.status(500).json({ message: "Server error" })
   }
 }
-
-
 
 const removeEmployee = async (req, res) => {
   try {
@@ -104,8 +113,5 @@ const removeEmployee = async (req, res) => {
     res.status(500).json({ message: "Server error" })
   }
 }
-
-
-
 
 module.exports = { getHrEmployees, removeEmployee }
